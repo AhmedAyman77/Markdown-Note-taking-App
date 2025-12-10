@@ -1,16 +1,19 @@
+import fs from 'fs';
+import path from 'path';
 import express from 'express';
 import noteRouter from './routes/note.route.js';
 import userRouter from './routes/user.route.js';
 import fileRouter from './routes/file.route.js';
+import authMiddleware from './middleware/auth.middleware.js';
 import { connectDB } from './config/db.config.js';
 import { errorHandler, notFound } from './middleware/error.middleware.js';
-import authMiddleware from './middleware/auth.middleware.js';
-import fs from 'fs';
-import path from 'path';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 if (!fs.existsSync(path.join(process.cwd(), 'src', process.env.UPLOAD_DIR))) {
     fs.mkdirSync(path.join(process.cwd(), 'src', process.env.UPLOAD_DIR), { recursive: true });

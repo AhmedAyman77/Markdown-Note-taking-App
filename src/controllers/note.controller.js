@@ -1,4 +1,17 @@
+import file from "../models/files.model.js";
 import note from "../models/notes.model.js";
+import { deleteFile } from "./file.controller.js";
+
+async function deleteNote(noteRecord) {
+    // get all files related to this note and delete them from storage
+    const files = await file.findAll({ where: { note_id: noteRecord.id } });
+
+    for (const fileRecord of files) {
+        await deleteFile(fileRecord);
+    }
+
+    await noteRecord.destroy();
+}
 
 const createNote = async(req, res) => {
     try {
@@ -16,20 +29,18 @@ const createNote = async(req, res) => {
     }
 }
 
-const deleteNote = async(req, res) => {
+const removeNote = async(req, res) => {
     try {
         const id = req.params.id;
         const userId = req.user.id;
 
-        const noteToDelete = await note.findOne({ where: { id, user_id: userId } });
-        if (!noteToDelete) {
+        const noteRecord = await note.findOne({ where: { id, user_id: userId } });
+        if (!noteRecord) {
             return res.status(404).json({ message: "Note not found" });
         }
 
-        // TODO
-        // delete files related to the note if any
+        await deleteNote(noteRecord);
 
-        await noteToDelete.destroy();
         res.status(200).json({ message: "Note deleted successfully" });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -84,4 +95,4 @@ const updateNote = async(req, res) => {
 }
 
 
-export { createNote, deleteNote, getNotes, getNoteById, updateNote };
+export { createNote, deleteNote, getNoteById, getNotes, updateNote, removeNote };
