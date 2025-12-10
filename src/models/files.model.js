@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import sequelize from "../config/db.config";
+import { sequelize } from "../config/db.config.js";
 
 const file = sequelize.define("file", {
     id: {
@@ -57,6 +57,10 @@ const file = sequelize.define("file", {
             fields: [
                 { name: "createdAt", order: "DESC" }
             ]
+        },
+        {
+            name: "idx_files_id",
+            fields: ["id"]
         }
     ]
 })

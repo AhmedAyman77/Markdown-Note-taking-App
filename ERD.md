@@ -31,7 +31,7 @@ This document describes the database schema for the Markdown Notes API, a note-t
 │ • id (PK)         VARCHAR(50)    │
 │ ○ user_id (FK)    VARCHAR(50)    │ → users.id
 │ • title           VARCHAR(200)   │
-│   content         TEXT            │
+│   content         TEXT           │
 │ • created_at      TIMESTAMP      │
 │ • updated_at      TIMESTAMP      │
 └────────┬─────────────────────────┘

@@ -1,43 +1,40 @@
 import express from 'express';
-import sequelize from './config/db.config.js';
+import noteRouter from './routes/note.route.js';
 import userRouter from './routes/user.route.js';
-
-
-// Connect to database with better error handling
-const connectDB = async() => {
-    try {
-        await sequelize.authenticate();
-        console.log('Database connected...');
-        // Optionally sync models
-        await sequelize.sync(); // to create tables if they don't exist but if add { force: true } to drop and recreate tables
-    } catch (err) {
-        console.error('Unable to connect to the database:', err);
-        process.exit(1); // Exit if DB connection fails
-    }
-};
-
+import fileRouter from './routes/file.route.js';
+import { connectDB } from './config/db.config.js';
+import { errorHandler, notFound } from './middleware/error.middleware.js';
+import authMiddleware from './middleware/auth.middleware.js';
+import fs from 'fs';
+import path from 'path';
 
 const app = express();
 
 app.use(express.json());
 
-// Routers
-app.use('/api/users', userRouter);
+if (!fs.existsSync(path.join(process.cwd(), 'src', process.env.UPLOAD_DIR))) {
+    fs.mkdirSync(path.join(process.cwd(), 'src', process.env.UPLOAD_DIR), { recursive: true });
+}
 
+
+// Routers
 app.get('/', (req, res) => {
     res.send('server is running');
 });
 
-// 404 Error Handling Middleware
-app.use((req, res, next) => {
-    res.status(404).send('404 Not Found');
-});
+app.use('/api/users', userRouter);
+app.use('/api/notes', authMiddleware, noteRouter);
+app.use('/api/files', authMiddleware, fileRouter);
 
-// General Error Handling Middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something broke!');
-});
+
+
+// error handling middleware
+app.use(notFound);
+app.use(errorHandler);
+
+
+
+
 
 // Start server only after DB connection
 connectDB().then(() => {

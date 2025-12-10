@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import sequelize from "../config/db.config.js";
+import { sequelize } from "../config/db.config.js";
 
 const note = sequelize.define("note", {
     id: {
@@ -42,6 +42,10 @@ const note = sequelize.define("note", {
         {
             name: "idx_notes_title_content",
             fields: ["title", "content"], // Composite index search on title and content or one of them
+        },
+        {
+            name: "idx_notes_id",
+            fields: ["id"]
         }
     ]
 })
