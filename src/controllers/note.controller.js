@@ -1,5 +1,6 @@
 import file from "../models/files.model.js";
 import note from "../models/notes.model.js";
+import { renderMarkdown } from "../utils/markdown.utils.js";
 import { deleteFile } from "./file.controller.js";
 
 async function deleteNote(noteRecord) {
@@ -18,12 +19,17 @@ const createNote = async(req, res) => {
         const { title, content } = req.body;
         const userId = req.user.id;
 
+        // render markdown to HTML
+        const html = renderMarkdown(content);
+
         const newNote = await note.create({
             user_id: userId,
             title,
-            content
+            content,
         });
-        res.status(201).json(newNote);
+        res.status(201).json({
+            render_content: html,
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -87,12 +93,18 @@ const updateNote = async(req, res) => {
         noteToUpdate.title = title || noteToUpdate.title;
         noteToUpdate.content = content || noteToUpdate.content;
 
+        // render the updated note
+        const html = renderMarkdown(noteToUpdate.content);
+
         await noteToUpdate.save();
-        res.status(200).json(noteToUpdate);
+        res.status(200).json({
+            noteToUpdate,
+            renderedContent: html
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 }
 
 
-export { createNote, deleteNote, getNoteById, getNotes, updateNote, removeNote };
+export { createNote, deleteNote, getNoteById, getNotes, removeNote, updateNote };

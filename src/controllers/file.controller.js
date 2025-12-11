@@ -1,6 +1,6 @@
 import { exec } from 'child_process';
 import file from '../models/files.model.js';
-import { processFileName } from '../utils/upload.js';
+import { processFileName } from '../utils/upload.utils.js';
 import note from '../models/notes.model.js';
 
 const uploadFile = async(req, res) => {
